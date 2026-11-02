@@ -29,8 +29,8 @@ forms: {
 },
 
   whatsapp: '64220910008',     // international format, no "+" or spaces
-  phoneDisplay: '022 910 008',
-  phoneHref: 'tel:022910008',
+  phoneDisplay: '022 091 0008',
+  phoneHref: 'tel:+64220910008',
 
   /* -------------------------------------------------------------------
      2) "SEE THE TRANSFORMATION" PROJECTS
