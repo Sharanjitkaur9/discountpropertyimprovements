@@ -7,7 +7,8 @@
 (() => {
   'use strict';
   const section = document.querySelector('.cinema-scroll');
-  if (!section || document.documentElement.classList.contains('simple-mode')) return;
+  const rootCls = document.documentElement.classList;
+  if (!section || rootCls.contains('simple-mode') || rootCls.contains('touch-lite')) return;   // phones use the auto-playing opening instead
   try {
   document.documentElement.classList.add('has-cinema');
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');

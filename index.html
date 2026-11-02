@@ -19,7 +19,8 @@
   // so they always get the simple, fully working version. ?full forces the animation for testing.
   var touch = window.matchMedia && matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches;
   var forceFull = /[?&]full\b/.test(location.search);
-  if (!forceFull && (!capable || lowPower || touch || /[?&]simple\b/.test(location.search))) d.classList.add('simple-mode');
+  if (!forceFull && (!capable || lowPower || /[?&]simple\b/.test(location.search))) d.classList.add('simple-mode');
+  else if (!forceFull && touch) d.classList.add('touch-lite');
   setTimeout(function () { if (!d.classList.contains('motion-ready')) { d.classList.remove('js'); d.classList.add('motion-failed'); } }, 3500);
 })();
 </script>
@@ -857,6 +858,38 @@
 </div>
 </section>
 </main>
+<section class="phone-intro" aria-label="Discount Property Improvements">
+  <div class="pi-scene on" data-i="0"><img src="assets/img/cinema/house-steps.webp" alt="" fetchpriority="high"></div>
+  <div class="pi-scene" data-i="1"><img src="assets/img/cinema/house-facade.webp" alt="" loading="lazy"></div>
+  <div class="pi-scene" data-i="2"><img src="assets/img/cinema/finished-frame.webp" alt="" loading="lazy"></div>
+  <div class="pi-shade"></div>
+  <div class="pi-copy">
+    <div class="pi-lines">
+      <div class="pi-line on" data-i="0"><span class="pi-eyebrow">Christchurch &amp; Canterbury</span><h1>Built to <em>transform.</em></h1><p>Quality construction and home improvements designed around your vision.</p></div>
+      <div class="pi-line" data-i="1"><span class="pi-eyebrow">01 · Plan &amp; design</span><h2>Every great space starts with a vision.</h2><p>From early concepts to the finishing details, we create practical and beautiful improvements.</p></div>
+      <div class="pi-line" data-i="2"><span class="pi-eyebrow">02 · Build &amp; finish</span><h2>Crafted with care. <em>Built to last.</em></h2><p>Professional workmanship and clear communication at every stage of your project.</p></div>
+    </div>
+    <div class="pi-tags"><a href="#services">Home Renovations</a><a href="#services">Property Improvements</a><a href="#reviews">Quality Craftsmanship</a></div>
+    <div class="cine-actions"><a class="cine-btn primary" href="#quote">Request a Free Quote</a><a class="cine-btn ghost" href="#services">Explore Our Services</a></div>
+    <div class="pi-dots" role="tablist" aria-label="Scenes"><button aria-label="Scene 1" class="on"></button><button aria-label="Scene 2"></button><button aria-label="Scene 3"></button></div>
+  </div>
+  <span class="pi-scroll" aria-hidden="true">Scroll</span>
+</section>
+<script>
+(function () {
+  var root = document.querySelector('.phone-intro');
+  if (!root || !document.documentElement.classList.contains('touch-lite')) return;
+  var scenes = root.querySelectorAll('.pi-scene'), lines = root.querySelectorAll('.pi-line'), dots = root.querySelectorAll('.pi-dots button');
+  var i = 0, timer = null, reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function show(n) {
+    i = (n + scenes.length) % scenes.length;
+    [scenes, lines, dots].forEach(function (list) { for (var k = 0; k < list.length; k++) list[k].classList.toggle('on', k === i); });
+  }
+  function start() { if (reduce) return; clearInterval(timer); timer = setInterval(function () { show(i + 1); }, 5200); }
+  for (var k = 0; k < dots.length; k++) (function (k) { dots[k].addEventListener('click', function () { show(k); start(); }); })(k);
+  start();
+})();
+</script>
 <section aria-labelledby="cf-title" class="cinema-final">
 <div class="cf-inner">
 <div>
