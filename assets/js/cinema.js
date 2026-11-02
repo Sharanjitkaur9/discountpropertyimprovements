@@ -221,17 +221,23 @@
   });
   // a drag should not also count as a click on a card
   track.addEventListener('click', e => { if (Math.abs(dragged) > 6) { e.stopPropagation(); e.preventDefault(); } dragged = 0; }, true);
-  // horizontal trackpad swipe: one swipe = one card. A pause of 250ms starts a new swipe, so
-  // tiny sideways wobbles while scrolling the page never add up into an accidental move.
+  // horizontal trackpad swipe: one swipe = one card.
+  // - a pause of 200ms ends a swipe, so tiny sideways wobbles while scrolling never add up
+  // - after a move, the swipe's fading momentum is ignored, but a NEW swipe (movement that grows
+  //   again, or goes the other way) is accepted straight away
+  let lastAbs = 0, lastSign = 0;
   track.addEventListener('wheel', e => {
     const now = performance.now();
-    if (now - lastWheel > 250) { wheelAcc = 0; wheelLocked = false; }
+    const dx = e.deltaX, ax = Math.abs(dx), sign = Math.sign(dx);
+    if (now - lastWheel > 200) { wheelAcc = 0; wheelLocked = false; lastAbs = 0; }
     lastWheel = now;
-    if (Math.abs(e.deltaX) < Math.abs(e.deltaY) * 2) return;   // mostly vertical: keep scrolling the page
+    if (ax <= Math.abs(e.deltaY)) return;                      // mostly up/down: keep scrolling the page
     e.preventDefault();
-    if (wheelLocked) return;                                   // ignore the swipe's leftover momentum
-    wheelAcc += e.deltaX;
-    if (Math.abs(wheelAcc) > 60) { moveSightSlider(wheelAcc > 0 ? 1 : -1); wheelAcc = 0; wheelLocked = true; }
+    if (wheelLocked && (sign !== lastSign || (ax > lastAbs * 1.6 && ax > 6))) { wheelLocked = false; wheelAcc = 0; }
+    lastAbs = ax; lastSign = sign;
+    if (wheelLocked) return;                                   // fading momentum of the last swipe
+    wheelAcc += dx;
+    if (Math.abs(wheelAcc) > 50) { moveSightSlider(wheelAcc > 0 ? 1 : -1); wheelAcc = 0; wheelLocked = true; }
   }, { passive: false });
   prev.addEventListener('click', () => moveSightSlider(-1));
   next.addEventListener('click', () => moveSightSlider(1));
