@@ -7,7 +7,8 @@
 (() => {
   'use strict';
   const section = document.querySelector('.cinema-scroll');
-  if (!section) return;
+  if (!section || document.documentElement.classList.contains('simple-mode')) return;
+  try {
   document.documentElement.classList.add('has-cinema');
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)');
   const track = section.querySelector('.sights-track');
@@ -284,4 +285,8 @@
   // closing scene: gentle photo settle when it comes into view
   const fin = document.querySelector('.cinema-final');
   if (fin && 'IntersectionObserver' in window) new IntersectionObserver(([e], o) => { if (e.isIntersecting) { fin.classList.add('in'); o.disconnect(); } }, { threshold: .25 }).observe(fin);
+  } catch (err) {
+    // anything unexpected on an unusual device: fall back to the simple version instead of a broken page
+    document.documentElement.classList.add('simple-mode'); console.warn('[DPI] opening animation turned off:', err);
+  }
 })();

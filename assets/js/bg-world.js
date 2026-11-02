@@ -11,7 +11,8 @@
   'use strict';
   const root = document.getElementById('bgworld');
   if (!root) return;
-  document.documentElement.classList.add('has-3d', 'has-world');
+  const d0 = document.documentElement;
+  d0.classList.add('has-3d', 'has-world');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const coarse = matchMedia('(pointer: coarse)').matches;   // phones/tablets
   const scenes = Array.from(root.querySelectorAll('.bw-scene'));
@@ -46,7 +47,7 @@
 
   // floating dust in warm light
   const dust = () => {
-    if (reduce) return;
+    if (reduce || d0.classList.contains('simple-mode')) return;
     const cv = root.querySelector('canvas'); const c = cv.getContext('2d');
     let W, H, P;
     const size = () => {

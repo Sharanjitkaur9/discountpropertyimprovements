@@ -1,3 +1,4 @@
+document.documentElement.classList.add('motion-ready');   // tells the safety net the scripts started
 /* =====================================================================
    Discount Property Improvements — motion layer
    Hero transformation loop · reveals · parallax · service cards ·

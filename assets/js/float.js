@@ -7,6 +7,7 @@
    ===================================================================== */
 (() => {
   'use strict';
+  if (document.documentElement.classList.contains('simple-mode')) return;
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const formCard = document.getElementById('section-quote-form');
   // float the individual pieces (no container boxes any more)
