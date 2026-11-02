@@ -422,3 +422,9 @@ button.pill[style*="rgba(214, 218, 223, 0.06)"], button.pill[style*="rgba(214, 2
 .cinema-scroll.native-slider .sight-card { scroll-snap-align: start; scroll-snap-stop: always; flex-shrink: 0; }
 /* phones: a long still stretch while the service cards are on screen */
 .cinema-scroll.native-slider { height: calc(100vh + 4300px); }
+
+/* ---------- simple version: older browsers, low-memory phones, data saver, or if a script fails ---------- */
+.simple-mode .cinema-scroll { display: none !important; }
+.simple-mode #bgworld .bw-scene img, .simple-mode #bgworld .bw-haze, .simple-mode #bgworld .bw-sweep { animation: none !important; }
+.simple-mode #bgworld canvas { display: none !important; }
+@supports not (translate: 1px) { .cinema-scroll { display: none !important; } }
