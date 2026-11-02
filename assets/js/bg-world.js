@@ -13,6 +13,7 @@
   if (!root) return;
   document.documentElement.classList.add('has-3d', 'has-world');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const coarse = matchMedia('(pointer: coarse)').matches;   // phones/tablets
   const scenes = Array.from(root.querySelectorAll('.bw-scene'));
   const byName = n => scenes.find(s => s.dataset.scene === n) || scenes[0];
 
@@ -40,7 +41,7 @@
     // the world stays hidden behind the opaque cinematic stage, then fades in as it releases
     const cine = document.querySelector('.cinema-scroll');
     const vis = cine ? Math.min(1, Math.max(0, (innerHeight - cine.getBoundingClientRect().bottom) / (innerHeight * 0.4) + 0.999)) : 1;
-    root.style.setProperty('--world-y', `${(-scrollY * 0.04 % 60).toFixed(1)}px`);
+    if (!coarse) root.style.setProperty('--world-y', `${(-scrollY * 0.04 % 60).toFixed(1)}px`);
   };
 
   // floating dust in warm light

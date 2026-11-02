@@ -94,7 +94,7 @@
      3. PARALLAX — service images drift a few pixels against the scroll
      ------------------------------------------------------------------ */
   const parallax = () => {
-    if (reduce) return;
+    if (reduce || matchMedia('(pointer: coarse)').matches) return;   // phones: photos stay still
     const imgs = $$('.svc-media img');
     let ticking = false;
     const update = () => {

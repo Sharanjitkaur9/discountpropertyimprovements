@@ -14,7 +14,8 @@
     .concat(formCard ? [formCard.parentElement] : []);
   if (!els.length) return;
   els.forEach((el, i) => { el.classList.add('fp'); el._phase = i * 1.7; });
-  if (reduce) { els.forEach(el => el.classList.add('fp-in')); return; }
+  // touch screens: cards stay perfectly still (scroll-linked motion looks shaky with finger scrolling)
+  if (reduce || matchMedia('(pointer: coarse)').matches) { els.forEach(el => el.classList.add('fp-in')); return; }
   const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
   const ease = x => 1 - Math.pow(1 - x, 3);
 
