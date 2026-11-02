@@ -407,3 +407,6 @@ button.pill[style*="rgba(214, 218, 223, 0.06)"], button.pill[style*="rgba(214, 2
 
 /* the gold blueprint sketch is removed: it clashed with the black, gray and white palette */
 .cinema-scroll .back-bazaar { display: none !important; }
+/* chat keeps a fixed height while it plays, so the page below never shifts while someone is reading */
+.dpi-chat .dc-body { height: 360px; max-height: none !important; }
+@media (max-width: 760px) { .dpi-chat .dc-body { height: 420px; } }
