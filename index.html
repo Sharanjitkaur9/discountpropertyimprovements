@@ -20,7 +20,8 @@
   var touch = window.matchMedia && matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches;
   var forceFull = /[?&]full\b/.test(location.search);
   if (!forceFull && (!capable || lowPower || /[?&]simple\b/.test(location.search))) d.classList.add('simple-mode');
-  else if (!forceFull && touch) d.classList.add('touch-lite');
+  // every device uses the auto-playing opening; ?full brings back the old scroll-controlled opening
+  else if (!forceFull) d.classList.add('touch-lite');
   setTimeout(function () { if (!d.classList.contains('motion-ready')) { d.classList.remove('js'); d.classList.add('motion-failed'); } }, 3500);
 })();
 </script>
@@ -761,7 +762,7 @@
     }
 </style>
 <link href="assets/css/motion.css?v=cfd1a699" rel="stylesheet"/>
-<link href="assets/css/cinema.css?v=952069db" rel="stylesheet"/>
+<link href="assets/css/cinema.css?v=a62ef835" rel="stylesheet"/>
 <link as="image" href="assets/img/cinema/house-steps.webp" rel="preload"/>
 
 <style class="">

@@ -495,3 +495,10 @@ button.pill[style*="rgba(214, 218, 223, 0.06)"], button.pill[style*="rgba(214, 2
 .contact-btn:hover { background: rgba(244,244,243,.22) !important; }
 .contact-btn.wa { background: #25D366 !important; border-color: #25D366; }
 .contact-btn.wa, .contact-btn.wa span, .contact-btn.wa svg { color: #fff !important; }
+@media (min-width: 1100px) {   /* computers: bigger, more cinematic headline */
+  .phone-intro .pi-copy { left: 64px; bottom: 72px; max-width: 980px; padding-bottom: 0; }
+  .phone-intro h1 { font-size: clamp(64px, 7vw, 120px); }
+  .phone-intro h2 { font-size: clamp(48px, 5vw, 88px); }
+  .phone-intro .pi-line p { font-size: 18px; max-width: 46ch; }
+  .phone-intro .pi-lines { min-height: 300px; }
+}
