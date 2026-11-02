@@ -29,7 +29,9 @@
   const smoothstep = (e0, e1, v) => { const x = clamp((v - e0) / (e1 - e0)); return x * x * (3 - 2 * x); };
   const lerp = (a, b, t) => a + (b - a) * t;
   const segmentInOut = (s, a, b, c, d) => { const enter = smoothstep(a, b, s), exit = smoothstep(c, d, s); return { enter, exit, active: enter * (1 - exit) }; };
-  const getScrollDistance = () => clamp(-section.getBoundingClientRect().top, 0, section.offsetHeight - VH());
+  const webIntro = document.documentElement.classList.contains('web-intro');
+  const START = webIntro ? 560 : 0;   // the landing above already did the opening title, so begin at the first story scene
+  const getScrollDistance = () => START + clamp(-section.getBoundingClientRect().top, 0, section.offsetHeight - VH());
   const set = (k, v) => section.style.setProperty(k, v);
   const isSmall = () => innerWidth <= 640;
   // phones & tablets: the services slider uses the device's own sideways scrolling (smooth, snaps, never fights the finger)
@@ -59,13 +61,13 @@
     const my = reduceMotion.matches ? 0 : mouseY * (isSmall() ? 0.3 : 1);
 
     const frame2 = segmentInOut(smoothScroll, 560, 900, 1300, 1620);
-    const frame3 = segmentInOut(smoothScroll, 1760, 2140, 2540, 2700);
+    const frame3 = webIntro ? segmentInOut(smoothScroll, 1420, 1640, 2300, 2480) : segmentInOut(smoothScroll, 1760, 2140, 2540, 2700);
     const progress = clamp(smoothScroll / 2700);
     const introExit = smoothstep(90, 650, smoothScroll);
     // phones: the cards arrive sooner, travel less, then rest for a long stretch so a finger can't shake or rewind them
-    const sightsEnterRaw = nativeSlider ? smoothstep(2700, 3050, smoothScroll) : smoothstep(2760, 3560, smoothScroll);
+    const sightsEnterRaw = nativeSlider ? smoothstep(2700, 3050, smoothScroll) : webIntro ? smoothstep(2380, 2900, smoothScroll) : smoothstep(2760, 3560, smoothScroll);
     const sightsEnter = Math.pow(sightsEnterRaw, 1.55);
-    const sightsControlsEnter = nativeSlider ? smoothstep(2950, 3150, smoothScroll) : smoothstep(3360, 3660, smoothScroll);
+    const sightsControlsEnter = nativeSlider ? smoothstep(2950, 3150, smoothScroll) : webIntro ? smoothstep(2800, 3000, smoothScroll) : smoothstep(3360, 3660, smoothScroll);
     const blurActive = clamp(frame2.active + frame3.active);
     const frame2Opacity = frame2.active * (1 - frame3.enter);
     const splitDrift = Math.pow(frame2.enter, 1.5);
