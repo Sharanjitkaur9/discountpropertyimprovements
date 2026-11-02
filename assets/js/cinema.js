@@ -162,7 +162,7 @@
       card.addEventListener('click', () => selectSightCard(card, true));
       card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectSightCard(card, true); } });
     });
-    track.addEventListener('transitionend', normalizeSightSlider);
+    track.addEventListener('transitionend', e => { if (e.target === track) normalizeSightSlider(); });
     updateSightSlider();
   }
   function updateSightSlider() {
@@ -200,13 +200,18 @@
   addEventListener('resize', () => { updateSightSlider(); requestTick(); });
   addEventListener('pointermove', e => { targetMouseX = e.clientX / innerWidth - 0.5; targetMouseY = e.clientY / innerHeight - 0.5; requestTick(); }, { passive: true });
   // swipe / drag (mouse, pen, touch) and horizontal trackpad scroll: drag left = next service
-  let dragX = null, dragged = 0, wheelAcc = 0, wheelT = 0;
-  track.addEventListener('pointerdown', e => { dragX = e.clientX; dragged = 0; });
+  let dragX = null, dragY = 0, dragged = 0, wheelAcc = 0, lastWheel = 0, wheelLocked = false;
+  const cancelDrag = () => { if (dragX === null) return; dragX = null; dragged = 0; track.classList.remove('dragging'); set('--drag', '0px'); };
+  track.addEventListener('pointerdown', e => { dragX = e.clientX; dragY = e.clientY; dragged = 0; });
   addEventListener('pointermove', e => {
     if (dragX === null) return;
-    dragged = e.clientX - dragX;
+    const dx = e.clientX - dragX, dy = e.clientY - dragY;
+    // the visitor is scrolling the page up/down, not swiping the slider: let go of it
+    if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { cancelDrag(); return; }
+    dragged = dx;
     if (Math.abs(dragged) > 6) { track.classList.add('dragging'); set('--drag', `${dragged}px`); }
   });
+  addEventListener('pointercancel', cancelDrag);
   addEventListener('pointerup', () => {
     if (dragX === null) return;
     const step = sightCards[0] ? sightCards[0].offsetWidth * 0.25 : 80;
@@ -216,11 +221,17 @@
   });
   // a drag should not also count as a click on a card
   track.addEventListener('click', e => { if (Math.abs(dragged) > 6) { e.stopPropagation(); e.preventDefault(); } dragged = 0; }, true);
+  // horizontal trackpad swipe: one swipe = one card. A pause of 250ms starts a new swipe, so
+  // tiny sideways wobbles while scrolling the page never add up into an accidental move.
   track.addEventListener('wheel', e => {
-    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;     // vertical wheel keeps scrolling the page
-    e.preventDefault(); wheelAcc += e.deltaX;
     const now = performance.now();
-    if (Math.abs(wheelAcc) > 60 && now - wheelT > 420) { moveSightSlider(wheelAcc > 0 ? 1 : -1); wheelAcc = 0; wheelT = now; }
+    if (now - lastWheel > 250) { wheelAcc = 0; wheelLocked = false; }
+    lastWheel = now;
+    if (Math.abs(e.deltaX) < Math.abs(e.deltaY) * 2) return;   // mostly vertical: keep scrolling the page
+    e.preventDefault();
+    if (wheelLocked) return;                                   // ignore the swipe's leftover momentum
+    wheelAcc += e.deltaX;
+    if (Math.abs(wheelAcc) > 60) { moveSightSlider(wheelAcc > 0 ? 1 : -1); wheelAcc = 0; wheelLocked = true; }
   }, { passive: false });
   prev.addEventListener('click', () => moveSightSlider(-1));
   next.addEventListener('click', () => moveSightSlider(1));
