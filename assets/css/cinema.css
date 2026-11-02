@@ -404,3 +404,6 @@ button.pill[style*="rgba(214, 218, 223, 0.06)"], button.pill[style*="rgba(214, 2
 .dpi-chat .dc-msg.me time { display: flex; align-items: center; gap: 2px; }
 .dpi-chat .dc-body { transition: opacity .6s ease; }
 .dpi-chat .dc-body.dc-fade { opacity: 0; }
+
+/* the gold blueprint sketch is removed: it clashed with the black, gray and white palette */
+.cinema-scroll .back-bazaar { display: none !important; }
