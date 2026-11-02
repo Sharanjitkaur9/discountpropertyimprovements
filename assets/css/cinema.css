@@ -482,3 +482,16 @@ button.pill[style*="rgba(214, 218, 223, 0.06)"], button.pill[style*="rgba(214, 2
   .phone-intro h1 { font-size: 36px; } .phone-intro h2 { font-size: 28px; }
   .phone-intro .pi-line p { font-size: 14px; margin-top: 8px; }
 }
+
+/* footer: Text / WhatsApp / Facebook buttons with labels */
+.contact-btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.contact-btn { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 18px; border-radius: 999px; background: #F4F4F3; color: #111214 !important; font: 700 14px/1 Manrope, sans-serif; text-decoration: none !important; transition: background .2s, transform .2s; }
+.contact-btn svg { width: 18px; height: 18px; flex: none; }
+.contact-btn:hover { background: #fff; transform: translateY(-1px); }
+.contact-btn.wa { background: #25D366; color: #fff !important; }
+.contact-btn.wa:hover { background: #20bd5a; }
+.contact-btn, .contact-btn span, .contact-btn svg { color: #F4F4F3 !important; }
+.contact-btn { background: rgba(244,244,243,.12) !important; border: 1px solid rgba(244,244,243,.35); }
+.contact-btn:hover { background: rgba(244,244,243,.22) !important; }
+.contact-btn.wa { background: #25D366 !important; border-color: #25D366; }
+.contact-btn.wa, .contact-btn.wa span, .contact-btn.wa svg { color: #fff !important; }
