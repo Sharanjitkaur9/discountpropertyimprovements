@@ -27,9 +27,16 @@
   const smoothstep = (e0, e1, v) => { const x = clamp((v - e0) / (e1 - e0)); return x * x * (3 - 2 * x); };
   const lerp = (a, b, t) => a + (b - a) * t;
   const segmentInOut = (s, a, b, c, d) => { const enter = smoothstep(a, b, s), exit = smoothstep(c, d, s); return { enter, exit, active: enter * (1 - exit) }; };
-  const getScrollDistance = () => clamp(-section.getBoundingClientRect().top, 0, section.offsetHeight - innerHeight);
+  const getScrollDistance = () => clamp(-section.getBoundingClientRect().top, 0, section.offsetHeight - VH());
   const set = (k, v) => section.style.setProperty(k, v);
   const isSmall = () => innerWidth <= 640;
+  // phones resize the window as the address bar hides/shows while scrolling; keep one stable
+  // height so the scene doesn't jump. Only a real change (rotation, new window size) updates it.
+  let stableW = innerWidth, stableH = innerHeight;
+  const VH = () => stableH;
+  addEventListener('resize', () => {
+    if (Math.abs(innerWidth - stableW) > 2 || Math.abs(innerHeight - stableH) > 160) { stableW = innerWidth; stableH = innerHeight; }
+  });
 
   let lastT = 0;
   function update(now) {
@@ -61,8 +68,8 @@
     const backScale = 0.76 + progress * 0.2 + frame2.enter * 0.18 + frame3.enter * 0.16;
     const sharedHeroY = progress * -74;
     const sharedHeroScale = progress * 0.23;
-    const sightsScreenTop = Math.min(220, Math.max(112, innerHeight * 0.19)) - 50;
-    const sightsParentTop = innerHeight - (innerHeight - sightsScreenTop) / backScale;
+    const sightsScreenTop = Math.min(220, Math.max(112, VH() * 0.19)) - 50;
+    const sightsParentTop = VH() - (VH() - sightsScreenTop) / backScale;
 
     set('--mx', mx.toFixed(4)); set('--my', my.toFixed(4));
     set('--skyb-opacity', smoothstep(1650, 2150, smoothScroll).toFixed(4)); // second house fades in for the craftsmanship scene
@@ -198,27 +205,33 @@
 
   addEventListener('scroll', requestTick, { passive: true });
   addEventListener('resize', () => { updateSightSlider(); requestTick(); });
-  addEventListener('pointermove', e => { targetMouseX = e.clientX / innerWidth - 0.5; targetMouseY = e.clientY / innerHeight - 0.5; requestTick(); }, { passive: true });
+  addEventListener('pointermove', e => { if (e.pointerType !== 'mouse') return; targetMouseX = e.clientX / innerWidth - 0.5; targetMouseY = e.clientY / VH() - 0.5; requestTick(); }, { passive: true });
   // swipe / drag (mouse, pen, touch) and horizontal trackpad scroll: drag left = next service
-  let dragX = null, dragY = 0, dragged = 0, wheelAcc = 0, lastWheel = 0, wheelLocked = false;
-  const cancelDrag = () => { if (dragX === null) return; dragX = null; dragged = 0; track.classList.remove('dragging'); set('--drag', '0px'); };
-  track.addEventListener('pointerdown', e => { dragX = e.clientX; dragY = e.clientY; dragged = 0; });
+  let dragX = null, dragY = 0, dragged = 0, dragAxis = '', dragT0 = 0, wheelAcc = 0, lastWheel = 0, wheelLocked = false;
+  const cancelDrag = () => { if (dragX === null) return; dragX = null; dragged = 0; dragAxis = ''; track.classList.remove('dragging'); set('--drag', '0px'); };
+  track.addEventListener('pointerdown', e => { dragX = e.clientX; dragY = e.clientY; dragged = 0; dragAxis = ''; dragT0 = performance.now(); });
   addEventListener('pointermove', e => {
     if (dragX === null) return;
     const dx = e.clientX - dragX, dy = e.clientY - dragY;
-    // the visitor is scrolling the page up/down, not swiping the slider: let go of it
-    if (Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx)) { cancelDrag(); return; }
+    // decide once, after the finger has moved a little, whether this is a sideways swipe or a page scroll
+    if (!dragAxis && Math.hypot(dx, dy) > 16) dragAxis = Math.abs(dx) >= Math.abs(dy) * 0.7 ? 'x' : 'y';
+    if (dragAxis === 'y') { cancelDrag(); return; }
+    if (dragAxis !== 'x') return;
     dragged = dx;
-    if (Math.abs(dragged) > 6) { track.classList.add('dragging'); set('--drag', `${dragged}px`); }
+    track.classList.add('dragging'); set('--drag', `${dragged}px`);
   });
-  addEventListener('pointercancel', cancelDrag);
-  addEventListener('pointerup', () => {
+  addEventListener('pointercancel', () => { if (dragAxis === 'x') finishDrag(); else cancelDrag(); });
+  function finishDrag() {
     if (dragX === null) return;
-    const step = sightCards[0] ? sightCards[0].offsetWidth * 0.25 : 80;
+    const width = sightCards[0] ? sightCards[0].offsetWidth : 300;
+    const speed = Math.abs(dragged) / Math.max(1, performance.now() - dragT0);   // px per ms
+    const go = dragAxis === 'x' && (Math.abs(dragged) > width * 0.18 || (Math.abs(dragged) > 30 && speed > 0.35));
+    const dir = dragged < 0 ? 1 : -1;
     track.classList.remove('dragging'); set('--drag', '0px');
-    if (Math.abs(dragged) > step) moveSightSlider(dragged < 0 ? 1 : -1);
-    dragX = null;
-  });
+    dragX = null; dragAxis = '';
+    if (go) moveSightSlider(dir);
+  }
+  addEventListener('pointerup', finishDrag);
   // a drag should not also count as a click on a card
   track.addEventListener('click', e => { if (Math.abs(dragged) > 6) { e.stopPropagation(); e.preventDefault(); } dragged = 0; }, true);
   // horizontal trackpad swipe: one swipe = one card.
