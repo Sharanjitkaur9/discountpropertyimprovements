@@ -30,6 +30,9 @@
   const getScrollDistance = () => clamp(-section.getBoundingClientRect().top, 0, section.offsetHeight - VH());
   const set = (k, v) => section.style.setProperty(k, v);
   const isSmall = () => innerWidth <= 640;
+  // phones & tablets: the services slider uses the device's own sideways scrolling (smooth, snaps, never fights the finger)
+  const nativeSlider = matchMedia('(pointer: coarse)').matches;
+  if (nativeSlider) section.classList.add('native-slider');
   // phones resize the window as the address bar hides/shows while scrolling; keep one stable
   // height so the scene doesn't jump. Only a real change (rotation, new window size) updates it.
   let stableW = innerWidth, stableH = innerHeight;
@@ -45,7 +48,7 @@
     const dt = lastT ? Math.min(0.1, ((now || performance.now()) - lastT) / 1000) : 1 / 60; lastT = now || performance.now();
     const k = 1 - Math.pow(1 - 0.14, dt * 60), km = 1 - Math.pow(1 - 0.12, dt * 60);
     targetScroll = getScrollDistance();
-    if (!initialized || reduceMotion.matches) { smoothScroll = targetScroll; initialized = true; }
+    if (!initialized || reduceMotion.matches || nativeSlider) { smoothScroll = targetScroll; initialized = true; }
     else smoothScroll = lerp(smoothScroll, targetScroll, k);
     if (Math.abs(smoothScroll - targetScroll) < 0.08) smoothScroll = targetScroll;
     mouseX = lerp(mouseX, targetMouseX, km);
@@ -57,9 +60,10 @@
     const frame3 = segmentInOut(smoothScroll, 1760, 2140, 2540, 2700);
     const progress = clamp(smoothScroll / 2700);
     const introExit = smoothstep(90, 650, smoothScroll);
-    const sightsEnterRaw = smoothstep(2760, 3560, smoothScroll);
+    // phones: the cards arrive sooner, travel less, then rest for a long stretch so a finger can't shake or rewind them
+    const sightsEnterRaw = nativeSlider ? smoothstep(2700, 3050, smoothScroll) : smoothstep(2760, 3560, smoothScroll);
     const sightsEnter = Math.pow(sightsEnterRaw, 1.55);
-    const sightsControlsEnter = smoothstep(3360, 3660, smoothScroll);
+    const sightsControlsEnter = nativeSlider ? smoothstep(2950, 3150, smoothScroll) : smoothstep(3360, 3660, smoothScroll);
     const blurActive = clamp(frame2.active + frame3.active);
     const frame2Opacity = frame2.active * (1 - frame3.enter);
     const splitDrift = Math.pow(frame2.enter, 1.5);
@@ -127,7 +131,7 @@
     controls.classList.toggle('is-ready', sightsControlsEnter > 0.98);
     set('--sights-visibility', sightsEnter > 0.01 ? 'visible' : 'hidden');
     set('--sights-y', '0px');
-    set('--sights-enter-x', `${((1 - sightsEnter) * 420).toFixed(3)}vw`);
+    set('--sights-enter-x', `${((1 - sightsEnter) * (nativeSlider ? 120 : 420)).toFixed(3)}vw`);
     set('--sights-scale', (1 / backScale).toFixed(5));
     // land the active card exactly at the left padding, whatever the background zoom is
     const W = innerWidth, sliderScreenX = -0.03 * W + mx * -12 + 0.53 * W * (1 - backScale);
@@ -170,17 +174,35 @@
       card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectSightCard(card, true); } });
     });
     track.addEventListener('transitionend', e => { if (e.target === track) normalizeSightSlider(); });
+    if (nativeSlider) {
+      const setWidth = () => sightCards[originalSightCount].offsetLeft - sightCards[0].offsetLeft;
+      requestAnimationFrame(() => { track.scrollLeft = setWidth(); });
+      let settle = 0;
+      track.addEventListener('scroll', () => {
+        clearTimeout(settle);
+        settle = setTimeout(() => {                      // after the swipe has fully stopped, quietly jump to the same card in the middle set
+          const w = setWidth(); if (!w) return;
+          if (track.scrollLeft < w * 0.5) track.scrollLeft += w;
+          else if (track.scrollLeft > w * 1.5) track.scrollLeft -= w;
+        }, 180);
+      }, { passive: true });
+    }
     updateSightSlider();
   }
   function updateSightSlider() {
     if (!sightCards.length) return;
     const cardWidth = sightCards[0].offsetWidth;
     const gap = parseFloat(getComputedStyle(track).columnGap || '0') || 0;
+    if (nativeSlider) { set('--sights-shift', '0px'); return; }
     set('--sights-shift', `${-(cardWidth + gap) * activeSight}px`);
     sightCards.forEach((c, i) => c.classList.toggle('is-active', i === activeSight));
   }
-  function moveSightSlider(dir) { activeSight += dir; updateSightSlider(); }
+  function moveSightSlider(dir) {
+    if (nativeSlider) { const w = sightCards[0].offsetWidth + (parseFloat(getComputedStyle(track).columnGap) || 0); track.scrollBy({ left: dir * w, behavior: 'smooth' }); return; }
+    activeSight += dir; updateSightSlider();
+  }
   function selectSightCard(card, navigate) {
+    if (nativeSlider) { if (navigate) goToService(card.dataset.service); return; }
     const i = Number(card.dataset.sightIndex);
     if (Number.isFinite(i)) { activeSight = i; updateSightSlider(); }
     if (navigate) goToService(card.dataset.service);
@@ -209,7 +231,7 @@
   // swipe / drag (mouse, pen, touch) and horizontal trackpad scroll: drag left = next service
   let dragX = null, dragY = 0, dragged = 0, dragAxis = '', dragT0 = 0, wheelAcc = 0, lastWheel = 0, wheelLocked = false;
   const cancelDrag = () => { if (dragX === null) return; dragX = null; dragged = 0; dragAxis = ''; track.classList.remove('dragging'); set('--drag', '0px'); };
-  track.addEventListener('pointerdown', e => { dragX = e.clientX; dragY = e.clientY; dragged = 0; dragAxis = ''; dragT0 = performance.now(); });
+  track.addEventListener('pointerdown', e => { if (nativeSlider) return; dragX = e.clientX; dragY = e.clientY; dragged = 0; dragAxis = ''; dragT0 = performance.now(); });
   addEventListener('pointermove', e => {
     if (dragX === null) return;
     const dx = e.clientX - dragX, dy = e.clientY - dragY;
@@ -240,6 +262,7 @@
   //   again, or goes the other way) is accepted straight away
   let lastAbs = 0, lastSign = 0;
   track.addEventListener('wheel', e => {
+    if (nativeSlider) return;
     const now = performance.now();
     const dx = e.deltaX, ax = Math.abs(dx), sign = Math.sign(dx);
     if (now - lastWheel > 200) { wheelAcc = 0; wheelLocked = false; lastAbs = 0; }
