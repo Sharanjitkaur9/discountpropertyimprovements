@@ -410,3 +410,15 @@ button.pill[style*="rgba(214, 218, 223, 0.06)"], button.pill[style*="rgba(214, 2
 /* chat keeps a fixed height while it plays, so the page below never shifts while someone is reading */
 .dpi-chat .dc-body { height: 360px; max-height: none !important; }
 @media (max-width: 760px) { .dpi-chat .dc-body { height: 420px; } }
+
+/* phones & tablets: the services slider is a normal swipeable row that snaps to each card */
+.cinema-scroll.native-slider .sights-track {
+  transform: translate3d(var(--fix, 20px), 0, 0) !important; transition: none !important;
+  overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch; touch-action: pan-x pan-y; scrollbar-width: none; cursor: auto;
+  scroll-padding-left: 0; padding-right: 48px;
+}
+.cinema-scroll.native-slider .sights-track::-webkit-scrollbar { display: none; }
+.cinema-scroll.native-slider .sight-card { scroll-snap-align: start; scroll-snap-stop: always; flex-shrink: 0; }
+/* phones: a long still stretch while the service cards are on screen */
+.cinema-scroll.native-slider { height: calc(100vh + 4300px); }
