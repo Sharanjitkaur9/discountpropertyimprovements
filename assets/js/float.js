@@ -31,7 +31,7 @@
       const f = Math.min(enter, leave);
       const dir = enter < leave ? 1 : -1;                 // arriving (1) or leaving (-1)
       const off = 1 - f;
-      const bob = Math.sin(t * 0.9 + el._phase) * 4 * f;
+      const bob = 0;   // cards stay still at rest; they only move as you scroll
       const y = dir * off * (small ? 40 : 80) + bob;
       el.style.translate = `0 ${y.toFixed(1)}px`;
       el.style.rotate = `x ${(dir * off * (small ? 4 : 7)).toFixed(2)}deg`;
