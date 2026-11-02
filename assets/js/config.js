@@ -20,8 +20,8 @@ window.DPI_CONFIG = {
        multipart/form-data and returns HTTP 2xx (JSON optional).
      ------------------------------------------------------------------- */
   forms: {
-    endpoint: '',
-    accessKey: '',
+       endpoint: 'https://api.web3forms.com/submit',
+   accessKey: 'PASTE-YOUR-WEB3FORMS-KEY-HERE',
     // Photo attachments are only sent if your form service plan accepts
     // files (Formspree paid plans / Web3Forms Pro / your own server).
     // When false, visitors are asked to send photos on WhatsApp instead.
