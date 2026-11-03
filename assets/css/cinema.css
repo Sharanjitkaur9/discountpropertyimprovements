@@ -343,7 +343,7 @@ html { scroll-behavior: smooth; }
 /* monochrome palette: black, graphite, gray, white */
 .stars-mono { color: #1C1D20 !important; }
 .star-btn { color: #C9CDD2 !important; transition: color .15s, transform .15s; }
-.star-btn.on { color: #111214 !important; }
+.star-btn.on { color: #F5B400 !important; }
 .star-btn:hover { transform: scale(1.12); }
 .has-world .cinema-final .stars-mono { color: #F4F4F3 !important; }
 .opt { color: #6E737A !important; }
