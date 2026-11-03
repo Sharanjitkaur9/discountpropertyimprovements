@@ -341,7 +341,10 @@ html { scroll-behavior: smooth; }
 .has-world .cinema-final .cine-actions { justify-content: center; }
 
 /* monochrome palette: black, graphite, gray, white */
-.stars-mono, .star-btn { color: #1C1D20 !important; }
+.stars-mono { color: #1C1D20 !important; }
+.star-btn { color: #C9CDD2 !important; transition: color .15s, transform .15s; }
+.star-btn.on { color: #111214 !important; }
+.star-btn:hover { transform: scale(1.12); }
 .has-world .cinema-final .stars-mono { color: #F4F4F3 !important; }
 .opt { color: #6E737A !important; }
 #chat-badge-counter { background: #111214 !important; color: #fff !important; }

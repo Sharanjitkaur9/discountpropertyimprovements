@@ -763,7 +763,7 @@
     }
 </style>
 <link href="assets/css/motion.css?v=cfd1a699" rel="stylesheet"/>
-<link href="assets/css/cinema.css?v=75d45c14" rel="stylesheet"/>
+<link href="assets/css/cinema.css?v=e075a0f9" rel="stylesheet"/>
 <link as="image" href="assets/img/cinema/house-steps.webp" rel="preload"/>
 
 <style class="">
@@ -1893,7 +1893,7 @@
     const updateStars = (val) => {
       stars.forEach(s => {
         const sVal = parseInt(s.dataset.value, 10);
-        s.style.color = sVal <= val ? '#D6DADF' : '#c5c6cb';
+        s.classList.toggle('on', sVal <= val);
       });
       if (ratingText) ratingText.textContent = ratingDescriptions[val] || (val + '.0 Rating');
     };
@@ -2207,4 +2207,4 @@
 <script defer="" src="assets/js/cinema.js?v=37d2c0d3"></script>
 <script defer="" src="assets/js/bg-world.js?v=64285613"></script>
 <script defer="" src="assets/js/chat.js?v=29ac2c6b"></script>
-</body></html>
+<script>(function(){var v=document.getElementById('review-rating-value');var n=parseInt(v&&v.value,10)||5;document.querySelectorAll('.star-btn').forEach(function(s){s.classList.toggle('on',parseInt(s.dataset.value,10)<=n);});})();</script></body></html>
