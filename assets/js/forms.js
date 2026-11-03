@@ -287,7 +287,7 @@
     form.noValidate = true;
     const success = $('review-success-state'), btn = $('submit-review-btn');
     const f = { rating: $('review-rating-value'), name: $('rev-name'), suburb: $('rev-suburb'), cat: $('rev-category'), text: $('rev-text') };
-    const spec = [[f.name, 'name'], [f.suburb, 'suburb'], [f.cat, 'select'], [f.text, 'review']];
+    const spec = [[f.name, 'name'], [f.suburb, 'suburb'], [f.cat, 'select']];   // written review is optional: a star rating alone is fine
     wire(spec);
     const drop = setupDrop('photo-dropzone', 'photo-file-input', 'dropzone-label', ['image/*']);
     const isBot = honeypot(form);
