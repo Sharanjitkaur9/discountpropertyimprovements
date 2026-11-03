@@ -30,7 +30,10 @@
   const lerp = (a, b, t) => a + (b - a) * t;
   const segmentInOut = (s, a, b, c, d) => { const enter = smoothstep(a, b, s), exit = smoothstep(c, d, s); return { enter, exit, active: enter * (1 - exit) }; };
   const webIntro = document.documentElement.classList.contains('web-intro');
-  const START = webIntro ? 900 : 0;   // the landing above already did the opening title, so begin at the first story scene
+  const START = 0;
+  // computers: the auto-playing landing sits inside the stage as the first screen and fades out exactly like the old title did
+  const landing = document.querySelector('.phone-intro');
+  if (webIntro && landing) { const stage = section.querySelector('.stage'); stage.appendChild(landing); landing.classList.add('in-stage'); }
   const getScrollDistance = () => START + clamp(-section.getBoundingClientRect().top, 0, section.offsetHeight - VH());
   const set = (k, v) => section.style.setProperty(k, v);
   const isSmall = () => innerWidth <= 640;
@@ -50,7 +53,7 @@
     rafPending = false;
     // the reference eases 0.14 / 0.12 per frame at 60 fps; scale by elapsed time so slower devices feel the same
     const dt = lastT ? Math.min(0.1, ((now || performance.now()) - lastT) / 1000) : 1 / 60; lastT = now || performance.now();
-    const k = 1 - Math.pow(1 - (webIntro ? 0.3 : 0.14), dt * 60), km = 1 - Math.pow(1 - 0.12, dt * 60);
+    const k = 1 - Math.pow(1 - 0.14, dt * 60), km = 1 - Math.pow(1 - 0.12, dt * 60);
     targetScroll = getScrollDistance();
     if (!initialized || reduceMotion.matches || nativeSlider) { smoothScroll = targetScroll; initialized = true; }
     else smoothScroll = lerp(smoothScroll, targetScroll, k);
@@ -60,15 +63,14 @@
     const mx = reduceMotion.matches ? 0 : mouseX * (isSmall() ? 0.3 : 1);
     const my = reduceMotion.matches ? 0 : mouseY * (isSmall() ? 0.3 : 1);
 
-    // computers with the landing: scenes overlap so there is never a photo-only gap
-    const frame2 = webIntro ? segmentInOut(smoothScroll, 560, 900, 1195, 1270) : segmentInOut(smoothScroll, 560, 900, 1300, 1620);
-    const frame3 = webIntro ? segmentInOut(smoothScroll, 1265, 1345, 1780, 1880) : segmentInOut(smoothScroll, 1760, 2140, 2540, 2700);
+    const frame2 = segmentInOut(smoothScroll, 560, 900, 1300, 1620);
+    const frame3 = segmentInOut(smoothScroll, 1760, 2140, 2540, 2700);
     const progress = clamp(smoothScroll / 2700);
     const introExit = smoothstep(90, 650, smoothScroll);
     // phones: the cards arrive sooner, travel less, then rest for a long stretch so a finger can't shake or rewind them
-    const sightsEnterRaw = nativeSlider ? smoothstep(2700, 3050, smoothScroll) : webIntro ? smoothstep(1790, 1990, smoothScroll) : smoothstep(2760, 3560, smoothScroll);
+    const sightsEnterRaw = nativeSlider ? smoothstep(2700, 3050, smoothScroll) : smoothstep(2760, 3560, smoothScroll);
     const sightsEnter = Math.pow(sightsEnterRaw, 1.55);
-    const sightsControlsEnter = nativeSlider ? smoothstep(2950, 3150, smoothScroll) : webIntro ? smoothstep(2000, 2120, smoothScroll) : smoothstep(3360, 3660, smoothScroll);
+    const sightsControlsEnter = nativeSlider ? smoothstep(2950, 3150, smoothScroll) : smoothstep(3360, 3660, smoothScroll);
     const blurActive = clamp(frame2.active + frame3.active);
     const frame2Opacity = frame2.active * (1 - frame3.enter);
     const splitDrift = Math.pow(frame2.enter, 1.5);
@@ -104,6 +106,7 @@
     set('--title-y', `${(introExit * -210).toFixed(2)}px`);
     set('--title-scale', (1 - introExit * 0.08).toFixed(4));
     set('--title-opacity', (1 - introExit).toFixed(4));
+    if (landing && webIntro) landing.style.pointerEvents = introExit > 0.85 ? 'none' : '';
 
     set('--bridge-x', `calc(-50% + ${(mx * 18).toFixed(2)}px)`);
     set('--bridge-y', `${(my * 8 + sharedHeroY - frame2.exit * 760).toFixed(2)}px`);

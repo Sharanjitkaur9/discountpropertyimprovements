@@ -504,5 +504,9 @@ button.pill[style*="rgba(214, 218, 223, 0.06)"], button.pill[style*="rgba(214, 2
 }
 
 /* computers: landing first, then the scroll animation carries on (its own title frame is skipped) */
-.web-intro .cinema-scroll { height: calc(100vh + 1600px); }
 .web-intro .cinema-scroll .hero-title, .web-intro .cinema-scroll .intro-copy { display: none !important; }
+
+/* computers: landing is the first screen of the scroll stage; it lifts and fades out like the old title */
+.phone-intro.in-stage { position: absolute !important; inset: 0; height: auto !important; min-height: 0 !important; z-index: 6;
+  opacity: var(--title-opacity, 1); transform: translate3d(0, var(--title-y, 0px), 0); will-change: opacity, transform; }
+.phone-intro.in-stage .pi-copy { bottom: 72px; }
