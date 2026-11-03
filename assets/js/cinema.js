@@ -64,13 +64,13 @@
     const my = reduceMotion.matches ? 0 : mouseY * (isSmall() ? 0.3 : 1);
 
     const frame2 = segmentInOut(smoothScroll, 560, 900, 1300, 1620);
-    const frame3 = segmentInOut(smoothScroll, 1760, 2140, 2540, 2700);
+    const frame3 = webIntro ? segmentInOut(smoothScroll, 1450, 1680, 2540, 2700) : segmentInOut(smoothScroll, 1760, 2140, 2540, 2700);
     const progress = clamp(smoothScroll / 2700);
     const introExit = smoothstep(90, 650, smoothScroll);
     // phones: the cards arrive sooner, travel less, then rest for a long stretch so a finger can't shake or rewind them
-    const sightsEnterRaw = nativeSlider ? smoothstep(2700, 3050, smoothScroll) : smoothstep(2760, 3560, smoothScroll);
+    const sightsEnterRaw = nativeSlider ? smoothstep(2700, 3050, smoothScroll) : webIntro ? smoothstep(2380, 2980, smoothScroll) : smoothstep(2760, 3560, smoothScroll);
     const sightsEnter = Math.pow(sightsEnterRaw, 1.55);
-    const sightsControlsEnter = nativeSlider ? smoothstep(2950, 3150, smoothScroll) : smoothstep(3360, 3660, smoothScroll);
+    const sightsControlsEnter = nativeSlider ? smoothstep(2950, 3150, smoothScroll) : webIntro ? smoothstep(2980, 3280, smoothScroll) : smoothstep(3360, 3660, smoothScroll);
     const blurActive = clamp(frame2.active + frame3.active);
     const frame2Opacity = frame2.active * (1 - frame3.enter);
     const splitDrift = Math.pow(frame2.enter, 1.5);
@@ -106,7 +106,12 @@
     set('--title-y', `${(introExit * -210).toFixed(2)}px`);
     set('--title-scale', (1 - introExit * 0.08).toFixed(4));
     set('--title-opacity', (1 - introExit).toFixed(4));
-    if (landing && webIntro) landing.style.pointerEvents = introExit > 0.85 ? 'none' : '';
+    if (landing && webIntro) {   // landing stays until the first story scene arrives, so there is no photo-only moment
+      const landExit = smoothstep(380, 820, smoothScroll);
+      landing.style.opacity = (1 - landExit).toFixed(4);
+      landing.style.transform = `translate3d(0, ${(landExit * -160).toFixed(1)}px, 0)`;
+      landing.style.pointerEvents = landExit > 0.85 ? 'none' : '';
+    }
 
     set('--bridge-x', `calc(-50% + ${(mx * 18).toFixed(2)}px)`);
     set('--bridge-y', `${(my * 8 + sharedHeroY - frame2.exit * 760).toFixed(2)}px`);
