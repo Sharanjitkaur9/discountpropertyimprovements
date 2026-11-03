@@ -21,7 +21,8 @@
   var forceFull = /[?&]full\b/.test(location.search);
   if (!forceFull && (!capable || lowPower || /[?&]simple\b/.test(location.search))) d.classList.add('simple-mode');
   // phones/tablets: auto-playing landing only. Computers: the same landing, then the scroll animation continues below it.
-  else if (!forceFull) d.classList.add(touch ? 'touch-lite' : 'web-intro');
+  // every device gets the simple phone version (landing + plain page, no scroll animation). ?full = old animation
+  else if (!forceFull) d.classList.add('touch-lite');
   setTimeout(function () { if (!d.classList.contains('motion-ready')) { d.classList.remove('js'); d.classList.add('motion-failed'); } }, 3500);
 })();
 </script>
@@ -2201,9 +2202,9 @@
 <script defer="" src="assets/js/config.js?v=60a0c20a"></script>
 <script defer="" src="assets/js/forms.js?v=7798fdcb"></script>
 <script defer="" src="assets/js/faq.js?v=9d500a56"></script>
-<script defer="" src="assets/js/motion.js?v=dd1a2ea0"></script>
-<script defer="" src="assets/js/float.js?v=ae960082"></script>
+<script defer="" src="assets/js/motion.js?v=be638b42"></script>
+<script defer="" src="assets/js/float.js?v=402f1233"></script>
 <script defer="" src="assets/js/cinema.js?v=37d2c0d3"></script>
-<script defer="" src="assets/js/bg-world.js?v=6dadd0fb"></script>
+<script defer="" src="assets/js/bg-world.js?v=64285613"></script>
 <script defer="" src="assets/js/chat.js?v=29ac2c6b"></script>
 </body></html>

@@ -95,7 +95,7 @@ document.documentElement.classList.add('motion-ready');   // tells the safety ne
      3. PARALLAX — service images drift a few pixels against the scroll
      ------------------------------------------------------------------ */
   const parallax = () => {
-    if (reduce || matchMedia('(pointer: coarse)').matches) return;   // phones: photos stay still
+    if (reduce || (matchMedia('(pointer: coarse)').matches || document.documentElement.classList.contains('touch-lite'))) return;   // phones: photos stay still
     const imgs = $$('.svc-media img');
     let ticking = false;
     const update = () => {

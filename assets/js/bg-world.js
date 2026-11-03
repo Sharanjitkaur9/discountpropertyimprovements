@@ -14,7 +14,7 @@
   const d0 = document.documentElement;
   d0.classList.add('has-3d', 'has-world');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const coarse = matchMedia('(pointer: coarse)').matches;   // phones/tablets
+  const coarse = (matchMedia('(pointer: coarse)').matches || document.documentElement.classList.contains('touch-lite'));   // phones/tablets
   const scenes = Array.from(root.querySelectorAll('.bw-scene'));
   const byName = n => scenes.find(s => s.dataset.scene === n) || scenes[0];
 
