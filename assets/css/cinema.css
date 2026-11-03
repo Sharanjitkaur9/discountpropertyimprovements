@@ -510,3 +510,7 @@ button.pill[style*="rgba(214, 218, 223, 0.06)"], button.pill[style*="rgba(214, 2
 .phone-intro.in-stage { position: absolute !important; inset: 0; height: auto !important; min-height: 0 !important; z-index: 6;
   opacity: var(--title-opacity, 1); transform: translate3d(0, var(--title-y, 0px), 0); will-change: opacity, transform; }
 .phone-intro.in-stage .pi-copy { bottom: 72px; }
+/* privacy note under the quote forms */
+.privacy-note { margin: 4px 0 0; font-size: 12px; line-height: 1.55; color: #6E737A !important; max-width: 72ch; }
+.privacy-note strong { color: #45474B; }
+.privacy-note a { color: inherit; text-decoration: underline; }
